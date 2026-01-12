@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P2P 메신저</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Login Modal -->
+    <div id="login-modal">
+        <div class="login-box">
+            <h2>메신저 시작하기</h2>
+            <p>사용할 이름을 입력하세요.</p>
+            <input type="text" id="name-input" placeholder="이름" autocomplete="off">
+            <button id="login-btn">참여하기</button>
+        </div>
+    </div>
+
+    <!-- Main App Container (Initially Hidden) -->
+    <div id="app-container" class="hidden">
+        <div id="sidebar">
+            <h2>접속 중인 사용자</h2>
+            <ul id="user-list">
+                <!-- User list will be populated here -->
+            </ul>
+        </div>
+        <div id="main-content">
+            <div id="chat-area">
+                <!-- Chat windows will be added here -->
+            </div>
+            <div id="chat-creation">
+                <button id="create-chat-btn">새로운 채팅 시작</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
