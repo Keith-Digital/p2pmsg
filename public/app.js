@@ -127,12 +127,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const headerEl = document.createElement('div');
         headerEl.className = 'chat-header';
+        
+        const roomNameSpan = document.createElement('span');
+        roomNameSpan.textContent = room.name;
+
+        const headerButtons = document.createElement('div');
+        headerButtons.className = 'header-buttons';
+
         const inviteBtn = document.createElement('button');
         inviteBtn.textContent = '초대';
         inviteBtn.className = 'invite-btn';
         inviteBtn.onclick = () => openInviteModal(room.id);
-        headerEl.textContent = room.name;
-        headerEl.appendChild(inviteBtn);
+
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = 'X';
+        closeBtn.className = 'close-btn';
+        closeBtn.onclick = () => closeRoom(room.id);
+
+        headerButtons.appendChild(inviteBtn);
+        headerButtons.appendChild(closeBtn);
+        headerEl.appendChild(roomNameSpan);
+        headerEl.appendChild(headerButtons);
         
         const messageListEl = document.createElement('div');
         messageListEl.className = 'message-list';
@@ -148,26 +163,60 @@ document.addEventListener('DOMContentLoaded', () => {
         chatArea.appendChild(windowEl);
 
         chatWindows.set(room.id, {
-            windowEl, headerEl, messageListEl, typingIndicatorEl,
+            windowEl, headerEl, roomNameSpan, messageListEl, typingIndicatorEl,
             typingUsers: new Set(),
             participants: new Set(room.participants)
         });
     }
 
+    function closeRoom(roomId) {
+        const chatInfo = chatWindows.get(roomId);
+        if (chatInfo) {
+            ws.send(JSON.stringify({ type: 'leave-room', roomId }));
+            chatInfo.windowEl.remove();
+            chatWindows.delete(roomId);
+            showEmptyState();
+        }
+    }
+
     function updateChatWindow(room) {
         const chatInfo = chatWindows.get(room.id);
         if (chatInfo) {
-            chatInfo.headerEl.childNodes[0].nodeValue = room.name;
+            chatInfo.roomNameSpan.textContent = room.name;
             chatInfo.participants = new Set(room.participants);
         }
     }
 
     function createChatInput(roomId) {
         let typingTimeout = null;
-        const messageInput = document.createElement('input');
-        messageInput.type = 'text';
+        const messageInput = document.createElement('textarea');
         messageInput.placeholder = '메시지를 입력하세요...';
+        messageInput.rows = 1; // Start with a single line
+
+        const sendMessage = () => {
+            clearTimeout(typingTimeout);
+            ws.send(JSON.stringify({ type: 'stop-typing', roomId }));
+            const content = messageInput.value.trim();
+            if (content) {
+                ws.send(JSON.stringify({ type: 'chat-message', roomId, content }));
+                messageInput.value = '';
+                messageInput.style.height = 'auto'; // Reset height
+            }
+        };
+
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
         messageInput.addEventListener('input', () => {
+            // Auto-resize textarea
+            messageInput.style.height = 'auto';
+            messageInput.style.height = (messageInput.scrollHeight) + 'px';
+
+            // Typing indicator logic
             clearTimeout(typingTimeout);
             ws.send(JSON.stringify({ type: 'start-typing', roomId }));
             typingTimeout = setTimeout(() => ws.send(JSON.stringify({ type: 'stop-typing', roomId })), 2000);
@@ -175,15 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const sendButton = document.createElement('button');
         sendButton.textContent = '전송';
-        sendButton.addEventListener('click', () => {
-            clearTimeout(typingTimeout);
-            ws.send(JSON.stringify({ type: 'stop-typing', roomId }));
-            const content = messageInput.value.trim();
-            if (content) {
-                ws.send(JSON.stringify({ type: 'chat-message', roomId, content }));
-                messageInput.value = '';
-            }
-        });
+        sendButton.addEventListener('click', sendMessage);
 
         const fileInput = document.createElement('input');
         fileInput.type = 'file';

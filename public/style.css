@@ -200,6 +200,11 @@ body, html {
     align-items: center;
 }
 
+.header-buttons {
+    display: flex;
+    gap: 10px;
+}
+
 .invite-btn {
     padding: 5px 10px;
     font-size: 0.8em;
@@ -207,6 +212,24 @@ body, html {
     border-radius: 5px;
     background-color: #fff;
     cursor: pointer;
+}
+
+.close-btn {
+    background-color: #ff5b5b;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 24px;
+    text-align: center;
+    padding: 0;
+}
+
+.close-btn:hover {
+    background-color: #d94848;
 }
 
 .message-list {
@@ -229,18 +252,22 @@ body, html {
 
 .chat-input-container {
     display: flex;
-    align-items: center;
+    align-items: flex-end; /* Align items to the bottom */
     padding: 10px;
     border-top: 1px solid #ddd;
 }
 
-.chat-input-container input[type="text"] {
+.chat-input-container textarea {
     flex-grow: 1;
     border: 1px solid #ccc;
     border-radius: 20px;
     padding: 8px 12px;
     font-size: 1em;
     margin: 0 10px;
+    resize: none; /* Disable manual resizing */
+    max-height: 100px; /* Limit growth */
+    overflow-y: auto; /* Add scrollbar when max-height is reached */
+    font-family: inherit; /* Inherit font from body */
 }
 
 .chat-input-container button {
@@ -278,6 +305,7 @@ body, html {
     border-radius: 18px;
     margin: 0;
     word-wrap: break-word;
+    white-space: pre-wrap; /* Render newlines */
 }
 
 .message .timestamp {
