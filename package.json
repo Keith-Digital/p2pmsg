@@ -2,18 +2,30 @@
   "name": "p2pmsg",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
+  "bin": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "build:exe": "pkg . --targets node18-win-x64 --output dist/p2pmsg.exe"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "pkg": {
+    "assets": [
+      "public/**/*",
+      "uploads/**/*"
+    ]
+  },
   "dependencies": {
     "express": "^5.2.1",
     "multer": "^2.0.2",
-    "uuid": "^13.0.0",
+    "uuid": "^8.3.2",
     "ws": "^8.19.0"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.1"
   }
 }
